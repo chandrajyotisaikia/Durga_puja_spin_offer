@@ -25,6 +25,64 @@ export const WHEEL_SEGMENTS: WheelSegment[] = [
   { label: '10%', sublabel: 'OFF ON TATTOO', color: '#EC4899', textColor: '#FFFFFF', probability: 8.9 },
 ];
 
+/** Decorative static wheel preview (CSS-only, no canvas) */
+function WheelTeaser() {
+  const segments = WHEEL_SEGMENTS;
+  const count = segments.length;
+  const angle = 360 / count;
+
+  return (
+    <div className="relative flex justify-center items-center mb-10 overflow-hidden" style={{ height: '140px' }}>
+      {/* Blurred wheel peek */}
+      <div
+        className="relative rounded-full shrink-0"
+        style={{
+          width: '260px',
+          height: '260px',
+          transform: 'translateY(80px)',
+          filter: 'blur(3px)',
+          opacity: 0.75,
+        }}
+      >
+        {/* Conic gradient wheel */}
+        <div
+          className="w-full h-full rounded-full"
+          style={{
+            background: `conic-gradient(${segments.map((seg, i) => `${seg.color} ${i * angle}deg ${(i + 1) * angle}deg`).join(', ')})`,
+            boxShadow: '0 0 40px rgba(201,162,39,0.4), 0 0 80px rgba(220,38,38,0.2)',
+          }}
+        />
+        {/* Gold ring */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{ border: '4px solid rgba(201,162,39,0.7)', boxSizing: 'border-box' }}
+        />
+        {/* Center circle */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ width: '52px', height: '52px', background: '#0D0D0D', border: '3px solid #C9A227' }}
+        />
+      </div>
+
+      {/* Gradient fade overlay — bottom fade to hide lower half */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, rgba(13,13,13,0.0) 0%, rgba(13,13,13,0.0) 30%, rgba(13,13,13,0.85) 70%, rgba(13,13,13,1) 100%)' }}
+      />
+
+      {/* Teaser label */}
+      <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center pb-1">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-px w-8 bg-primary/40" />
+          <span className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: '#C9A227' }}>Your Discount Awaits</span>
+          <div className="h-px w-8 bg-primary/40" />
+        </div>
+        <p className="text-muted-foreground text-xs text-center">Enter your details below to unlock the wheel 👇</p>
+      </div>
+    </div>
+  );
+}
+
 export default function SpinWheelSection() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [userName, setUserName] = useState('');
@@ -109,7 +167,11 @@ export default function SpinWheelSection() {
 
         {/* Lead form or wheel */}
         {!isUnlocked ? (
-          <LeadCaptureForm onSubmit={handleFormSubmit} />
+          <>
+            {/* Wheel teaser peek */}
+            <WheelTeaser />
+            <LeadCaptureForm onSubmit={handleFormSubmit} />
+          </>
         ) : (
           <SpinWheel
             segments={WHEEL_SEGMENTS}

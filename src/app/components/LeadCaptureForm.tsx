@@ -8,21 +8,35 @@ interface LeadCaptureFormProps {
 export default function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+  const [agreed, setAgreed] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; phone?: string; agreed?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
-    const newErrors: { name?: string; phone?: string } = {};
+    const newErrors: { name?: string; phone?: string; agreed?: string } = {};
     if (!name.trim() || name.trim().length < 2) newErrors.name = 'Please enter your full name';
     if (!phone.trim() || !/^[6-9]\d{9}$/.test(phone.trim())) newErrors.phone = 'Enter a valid 10-digit Indian mobile number';
+    if (!agreed) newErrors.agreed = 'You must agree to the terms to claim your discount';
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setIsSubmitting(true);
+
+    // ── Supabase lead capture (wire up here) ──────────────────────────────
+    // Example:
+    // const { error } = await supabase.from('leads').insert([{
+    //   name: name.trim(),
+    //   phone: `+91${phone.trim()}`,
+    //   agreed_to_terms: true,
+    //   created_at: new Date().toISOString(),
+    // }]);
+    // if (error) console.error('Supabase insert error:', error);
+    // ─────────────────────────────────────────────────────────────────────
+
     setTimeout(() => {
       setIsSubmitting(false);
       onSubmit(name.trim());
@@ -85,6 +99,41 @@ export default function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
             {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
           </div>
 
+          {/* T&C Checkbox */}
+          <div className="pt-1">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <div className="relative mt-0.5 shrink-0">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={e => { setAgreed(e.target.checked); setErrors(prev => ({ ...prev, agreed: undefined })); }}
+                  className="sr-only"
+                />
+                <div
+                  className="w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                  style={{
+                    borderColor: agreed ? '#C9A227' : errors.agreed ? '#DC2626' : 'rgba(201,162,39,0.4)',
+                    background: agreed ? 'rgba(201,162,39,0.15)' : 'transparent',
+                  }}
+                >
+                  {agreed && (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="#C9A227" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+              </div>
+              <span className="text-xs text-muted-foreground leading-relaxed">
+                I agree to the{' '}
+                <span className="text-primary underline underline-offset-2 cursor-pointer">terms and conditions</span>
+                {' '}and{' '}
+                <span className="text-primary underline underline-offset-2 cursor-pointer">privacy policy</span>
+                {' '}to claim my discount. I consent to being contacted by Inkfinity Tattoos & Piercing regarding this offer.
+              </span>
+            </label>
+            {errors.agreed && <p className="text-red-400 text-xs mt-1.5 ml-8">{errors.agreed}</p>}
+          </div>
+
           <button
             type="submit"
             disabled={isSubmitting}
@@ -102,10 +151,6 @@ export default function LeadCaptureForm({ onSubmit }: LeadCaptureFormProps) {
             )}
           </button>
         </form>
-
-        <p className="text-muted-foreground text-xs text-center mt-4 leading-relaxed">
-          By submitting, you agree to be contacted by Inkfinity Tattoos & Piercing regarding your discount offer.
-        </p>
       </div>
     </div>
   );

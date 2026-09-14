@@ -22,7 +22,6 @@ function getMegaIndex(segments: WheelSegment[]): number {
   return segments.findIndex(s => s.isMega);
 }
 
-// Web Audio API sound synthesis
 function createAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   try {
@@ -48,7 +47,6 @@ function playSpinTickSound(audioCtx: AudioContext, time: number) {
 function playWinSound(audioCtx: AudioContext, isMega: boolean) {
   const now = audioCtx.currentTime;
   if (isMega) {
-    // Triumphant fanfare for mega win
     const notes = [523, 659, 784, 1047, 1319];
     notes.forEach((freq, i) => {
       const osc = audioCtx.createOscillator();
@@ -63,7 +61,6 @@ function playWinSound(audioCtx: AudioContext, isMega: boolean) {
       osc.start(now + i * 0.12);
       osc.stop(now + i * 0.12 + 0.4);
     });
-    // Add bell-like overtone
     const bell = audioCtx.createOscillator();
     const bellGain = audioCtx.createGain();
     bell.connect(bellGain);
@@ -75,7 +72,6 @@ function playWinSound(audioCtx: AudioContext, isMega: boolean) {
     bell.start(now + 0.6);
     bell.stop(now + 1.8);
   } else {
-    // Cheerful win jingle
     const notes = [523, 659, 784, 1047];
     notes.forEach((freq, i) => {
       const osc = audioCtx.createOscillator();
@@ -91,6 +87,61 @@ function playWinSound(audioCtx: AudioContext, isMega: boolean) {
       osc.stop(now + i * 0.1 + 0.3);
     });
   }
+}
+
+/** Draw a minimal tattoo machine icon on canvas at (cx, cy) with given radius */
+function drawTattooMachineIcon(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  const s = r * 0.55; // scale factor
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // Body
+  ctx.beginPath();
+  ctx.roundRect(-s * 0.55, -s * 0.9, s * 1.1, s * 1.4, s * 0.15);
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fill();
+  ctx.strokeStyle = '#C9A227';
+  ctx.lineWidth = s * 0.08;
+  ctx.stroke();
+
+  // Coil lines
+  for (let i = 0; i < 4; i++) {
+    ctx.beginPath();
+    ctx.roundRect(-s * 0.42, -s * 0.55 + i * s * 0.22, s * 0.84, s * 0.14, s * 0.05);
+    ctx.fillStyle = 'rgba(201,162,39,0.35)';
+    ctx.fill();
+  }
+
+  // Top cap
+  ctx.beginPath();
+  ctx.roundRect(-s * 0.65, -s * 1.05, s * 1.3, s * 0.2, s * 0.08);
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fill();
+  ctx.strokeStyle = '#C9A227';
+  ctx.lineWidth = s * 0.06;
+  ctx.stroke();
+
+  // Needle
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.06, s * 0.5);
+  ctx.lineTo(-s * 0.06, s * 1.1);
+  ctx.lineTo(0, s * 1.35);
+  ctx.lineTo(s * 0.06, s * 1.1);
+  ctx.lineTo(s * 0.06, s * 0.5);
+  ctx.closePath();
+  ctx.fillStyle = '#C9A227';
+  ctx.fill();
+
+  // LED dot
+  ctx.beginPath();
+  ctx.arc(0, -s * 0.72, s * 0.1, 0, Math.PI * 2);
+  ctx.fillStyle = '#DC2626';
+  ctx.shadowBlur = s * 0.3;
+  ctx.shadowColor = '#DC2626';
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.restore();
 }
 
 export default function SpinWheel({ segments, onSpinComplete, megaOverride }: SpinWheelProps) {
@@ -214,13 +265,8 @@ export default function SpinWheel({ segments, onSpinComplete, megaOverride }: Sp
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Center lotus/om symbol
-    ctx.fillStyle = '#C9A227';
-    ctx.font = `${centerRadius * 1.1}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🪷', cx, cy);
-    ctx.textBaseline = 'alphabetic';
+    // Draw tattoo machine icon in center
+    drawTattooMachineIcon(ctx, cx, cy, centerRadius);
 
     // Inner gold ring
     ctx.beginPath();
@@ -309,6 +355,9 @@ export default function SpinWheel({ segments, onSpinComplete, megaOverride }: Sp
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
   }, []);
+
+  // suppress unused warning
+  void rotation;
 
   return (
     <div className="flex flex-col items-center gap-6 animate-fade-in">
