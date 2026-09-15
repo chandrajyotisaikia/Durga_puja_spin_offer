@@ -20,7 +20,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center sm:text-right">
-          <p className="text-muted-foreground text-xs">© 2025 Chandrajyoti Saikia</p>
+          <p className="text-muted-foreground text-xs">© 2026 Chandrajyoti Saikia</p>
           <p className="text-xs mt-0.5" style={{ color: '#C9A227', fontFamily: 'serif', fontStyle: 'italic' }}>🙏 Jai Maa Durga</p>
         </div>
       </div>

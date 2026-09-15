@@ -1,12 +1,10 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const tiltRef = useRef<HTMLDivElement>(null);
-  const [tiltStyle, setTiltStyle] = useState({ transform: 'perspective(800px) rotateX(0deg) rotateY(0deg)' });
 
   useEffect(() => {
     const elements = sectionRef.current?.querySelectorAll('.hero-anim');
@@ -75,47 +73,6 @@ export default function HeroSection() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
-    };
-  }, []);
-
-  // 3D tilt effect on mouse/touch move
-  useEffect(() => {
-    const el = tiltRef.current;
-    if (!el) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      setTiltStyle({
-        transform: `perspective(800px) rotateX(${-y * 22}deg) rotateY(${x * 22}deg) scale3d(1.04,1.04,1.04)`,
-      });
-    };
-    const handleMouseLeave = () => {
-      setTiltStyle({ transform: 'perspective(800px) rotateX(0deg) rotateY(0deg)' });
-    };
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const rect = el.getBoundingClientRect();
-      const x = (touch.clientX - rect.left) / rect.width - 0.5;
-      const y = (touch.clientY - rect.top) / rect.height - 0.5;
-      setTiltStyle({
-        transform: `perspective(800px) rotateX(${-y * 14}deg) rotateY(${x * 14}deg) scale3d(1.02,1.02,1.02)`,
-      });
-    };
-    const handleTouchEnd = () => {
-      setTiltStyle({ transform: 'perspective(800px) rotateX(0deg) rotateY(0deg)' });
-    };
-
-    el.addEventListener('mousemove', handleMouseMove);
-    el.addEventListener('mouseleave', handleMouseLeave);
-    el.addEventListener('touchmove', handleTouchMove, { passive: true });
-    el.addEventListener('touchend', handleTouchEnd);
-    return () => {
-      el.removeEventListener('mousemove', handleMouseMove);
-      el.removeEventListener('mouseleave', handleMouseLeave);
-      el.removeEventListener('touchmove', handleTouchMove);
-      el.removeEventListener('touchend', handleTouchEnd);
     };
   }, []);
 
@@ -285,19 +242,7 @@ export default function HeroSection() {
           0%, 100% { opacity: 0.5; }
           50% { opacity: 1; }
         }
-        @keyframes skullFloat {
-          0%, 100% { transform: translateY(0px) rotateY(-8deg) rotateX(4deg); }
-          50% { transform: translateY(-14px) rotateY(8deg) rotateX(-4deg); }
-        }
-        @keyframes crackGlow {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.9; }
-        }
-        .tilt-card {
-          transition: transform 0.15s ease-out;
-          transform-style: preserve-3d;
-          will-change: transform;
-        }
+        
       `}</style>
 
       {/* Header bar */}
@@ -329,7 +274,7 @@ export default function HeroSection() {
           {/* Eyebrow */}
           <div className="hero-anim opacity-0 inline-flex items-center gap-3 mb-6">
             <div className="h-px w-12 bg-red-600/60" />
-            <span className="text-xs font-semibold uppercase tracking-[0.35em]" style={{ color: '#DC2626' }}>Durga Puja 2025 Special</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.35em]" style={{ color: '#DC2626' }}>Durga Puja 2026 Special</span>
             <div className="h-px w-12 bg-red-600/60" />
           </div>
 
@@ -374,176 +319,6 @@ export default function HeroSection() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary">
               <path d="M12 5v14M5 12l7 7 7-7" />
             </svg>
-          </div>
-        </div>
-
-        {/* Right: 3D Skull Tattoo Element */}
-        <div className="hero-anim opacity-0 flex-shrink-0 flex items-center justify-center">
-          <div
-            ref={tiltRef}
-            className="tilt-card cursor-pointer select-none"
-            style={tiltStyle}
-          >
-            {/* Outer glow container */}
-            <div
-              className="relative rounded-2xl p-6 md:p-8"
-              style={{
-                background: 'linear-gradient(135deg, rgba(201,162,39,0.08) 0%, rgba(220,38,38,0.06) 50%, rgba(13,13,13,0.95) 100%)',
-                border: '1px solid rgba(201,162,39,0.25)',
-                boxShadow: '0 0 60px rgba(220,38,38,0.2), 0 0 120px rgba(201,162,39,0.1), inset 0 1px 0 rgba(255,215,0,0.1)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              {/* Floating glow orb behind skull */}
-              <div
-                className="absolute inset-0 rounded-2xl"
-                style={{
-                  background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(220,38,38,0.18) 0%, transparent 70%)',
-                  animation: 'glowPulse 3s ease-in-out infinite',
-                }}
-              />
-
-              {/* 3D Skull Tattoo SVG */}
-              <svg
-                viewBox="0 0 200 240"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-40 h-48 md:w-52 md:h-60 relative z-10"
-                style={{
-                  animation: 'skullFloat 5s ease-in-out infinite',
-                  filter: 'drop-shadow(0 8px 28px rgba(220,38,38,0.5)) drop-shadow(0 0 16px rgba(201,162,39,0.35))',
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                <defs>
-                  <radialGradient id="skullFace" cx="45%" cy="40%" r="60%">
-                    <stop offset="0%" stopColor="#d4c5a9"/>
-                    <stop offset="40%" stopColor="#b8a88a"/>
-                    <stop offset="100%" stopColor="#5a4a35"/>
-                  </radialGradient>
-                  <radialGradient id="skullSide" cx="80%" cy="40%" r="60%">
-                    <stop offset="0%" stopColor="#8a7a60"/>
-                    <stop offset="100%" stopColor="#3a2e20"/>
-                  </radialGradient>
-                  <radialGradient id="eyeSocket" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#0a0a0a"/>
-                    <stop offset="60%" stopColor="#1a0a0a"/>
-                    <stop offset="100%" stopColor="#2a1010"/>
-                  </radialGradient>
-                  <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#FF2200" stopOpacity="0.9"/>
-                    <stop offset="100%" stopColor="#880000" stopOpacity="0"/>
-                  </radialGradient>
-                  <linearGradient id="jawGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#a09070"/>
-                    <stop offset="100%" stopColor="#4a3a28"/>
-                  </linearGradient>
-                  <linearGradient id="crackGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#DC2626"/>
-                    <stop offset="100%" stopColor="#C9A227"/>
-                  </linearGradient>
-                  <filter id="skullShadow">
-                    <feDropShadow dx="4" dy="6" stdDeviation="4" floodColor="#000" floodOpacity="0.6"/>
-                  </filter>
-                </defs>
-
-                {/* === SKULL CRANIUM === */}
-                {/* Main cranium — 3D rounded dome */}
-                <ellipse cx="100" cy="88" rx="68" ry="72" fill="url(#skullFace)" filter="url(#skullShadow)"/>
-                {/* Right side shading for 3D depth */}
-                <ellipse cx="148" cy="88" rx="22" ry="60" fill="url(#skullSide)" opacity="0.7"/>
-                {/* Top highlight */}
-                <ellipse cx="85" cy="52" rx="28" ry="18" fill="rgba(255,255,240,0.18)" transform="rotate(-15 85 52)"/>
-                {/* Subtle brow ridge */}
-                <path d="M42 100 Q70 88 100 90 Q130 88 158 100" stroke="rgba(60,40,20,0.5)" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
-                {/* === EYE SOCKETS === */}
-                {/* Left eye socket */}
-                <ellipse cx="74" cy="112" rx="22" ry="20" fill="url(#eyeSocket)"/>
-                <ellipse cx="74" cy="112" rx="18" ry="16" fill="#050505"/>
-                {/* Left eye red glow */}
-                <ellipse cx="74" cy="112" rx="14" ry="12" fill="url(#eyeGlow)" style={{ animation: 'crackGlow 2.5s ease-in-out infinite' }}/>
-                <ellipse cx="74" cy="112" rx="7" ry="6" fill="#FF1100" opacity="0.8"/>
-                <ellipse cx="71" cy="109" rx="3" ry="2.5" fill="rgba(255,200,200,0.4)"/>
-
-                {/* Right eye socket */}
-                <ellipse cx="126" cy="112" rx="22" ry="20" fill="url(#eyeSocket)"/>
-                <ellipse cx="126" cy="112" rx="18" ry="16" fill="#050505"/>
-                {/* Right eye red glow */}
-                <ellipse cx="126" cy="112" rx="14" ry="12" fill="url(#eyeGlow)" style={{ animation: 'crackGlow 2.5s ease-in-out infinite 0.4s' }}/>
-                <ellipse cx="126" cy="112" rx="7" ry="6" fill="#FF1100" opacity="0.8"/>
-                <ellipse cx="123" cy="109" rx="3" ry="2.5" fill="rgba(255,200,200,0.4)"/>
-
-                {/* === NOSE CAVITY === */}
-                <path d="M92 138 Q100 128 108 138 Q104 148 100 150 Q96 148 92 138Z" fill="#0a0a0a"/>
-                <path d="M94 140 Q100 132 106 140" stroke="rgba(60,40,20,0.4)" strokeWidth="1" fill="none"/>
-
-                {/* === CHEEKBONES === */}
-                <path d="M42 118 Q55 130 68 132" stroke="rgba(80,60,30,0.5)" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                <path d="M158 118 Q145 130 132 132" stroke="rgba(80,60,30,0.5)" strokeWidth="2" fill="none" strokeLinecap="round"/>
-
-                {/* === JAW === */}
-                <path d="M42 130 Q38 155 50 168 Q70 182 100 184 Q130 182 150 168 Q162 155 158 130 Q148 140 100 145 Q52 140 42 130Z" fill="url(#jawGrad)"/>
-                {/* Jaw shading */}
-                <path d="M148 132 Q158 150 150 168 Q140 178 120 182" stroke="rgba(30,20,10,0.5)" strokeWidth="2" fill="none"/>
-
-                {/* === TEETH === */}
-                {[58, 70, 82, 94, 106, 118, 130, 142].map((x, i) => (
-                  <rect
-                    key={i}
-                    x={x}
-                    y={168}
-                    width={10}
-                    height={i === 0 || i === 7 ? 10 : 14}
-                    rx="2"
-                    fill={i % 2 === 0 ? '#e8e0d0' : '#d4c8b0'}
-                    stroke="rgba(80,60,30,0.4)"
-                    strokeWidth="0.5"
-                  />
-                ))}
-                {/* Tooth gap shadows */}
-                {[68, 80, 92, 104, 116, 128, 140].map((x, i) => (
-                  <line key={i} x1={x} y1={168} x2={x} y2={182} stroke="rgba(30,20,10,0.4)" strokeWidth="1"/>
-                ))}
-
-                {/* === TATTOO CRACKS / DESIGN LINES === */}
-                {/* Main forehead crack */}
-                <path d="M100 30 L96 50 L102 65 L97 80 L100 90" stroke="url(#crackGrad)" strokeWidth="2" fill="none" strokeLinecap="round" style={{ animation: 'crackGlow 3s ease-in-out infinite' }}/>
-                {/* Left crack branch */}
-                <path d="M97 60 L82 72 L75 68" stroke="url(#crackGrad)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.8"/>
-                {/* Right crack branch */}
-                <path d="M102 65 L118 74 L125 70" stroke="url(#crackGrad)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.8"/>
-                {/* Left temple crack */}
-                <path d="M44 95 L55 105 L50 118 L58 128" stroke="url(#crackGrad)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7"/>
-                {/* Right temple crack */}
-                <path d="M156 95 L145 105 L150 118 L142 128" stroke="url(#crackGrad)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.7"/>
-
-                {/* === TATTOO DECORATIVE ELEMENTS === */}
-                {/* Floral/tribal motif top */}
-                <path d="M100 18 C95 10 88 8 88 14 C88 18 94 20 100 18Z" fill="rgba(201,162,39,0.6)" stroke="#C9A227" strokeWidth="0.8"/>
-                <path d="M100 18 C105 10 112 8 112 14 C112 18 106 20 100 18Z" fill="rgba(201,162,39,0.6)" stroke="#C9A227" strokeWidth="0.8"/>
-                <circle cx="100" cy="16" r="3" fill="#C9A227" opacity="0.8"/>
-                {/* Side tribal lines left */}
-                <path d="M32 80 Q28 90 32 100 Q36 90 32 80Z" fill="rgba(201,162,39,0.4)" stroke="#C9A227" strokeWidth="0.8"/>
-                <path d="M28 92 L38 92" stroke="#C9A227" strokeWidth="1" opacity="0.5"/>
-                {/* Side tribal lines right */}
-                <path d="M168 80 Q172 90 168 100 Q164 90 168 80Z" fill="rgba(201,162,39,0.4)" stroke="#C9A227" strokeWidth="0.8"/>
-                <path d="M162 92 L172 92" stroke="#C9A227" strokeWidth="1" opacity="0.5"/>
-
-                {/* === INKFINITY BRAND BELOW === */}
-                <text x="100" y="210" textAnchor="middle" fill="rgba(201,162,39,0.7)" fontSize="8" fontFamily="sans-serif" fontWeight="bold" letterSpacing="3">INKFINITY</text>
-                <line x1="60" y1="214" x2="140" y2="214" stroke="rgba(201,162,39,0.3)" strokeWidth="0.5"/>
-
-                {/* === GROUND SHADOW === */}
-                <ellipse cx="100" cy="228" rx="52" ry="8" fill="rgba(0,0,0,0.4)" style={{ filter: 'blur(4px)' }}/>
-              </svg>
-
-              {/* Corner accent dots */}
-              <div className="absolute top-3 left-3 w-1.5 h-1.5 rounded-full bg-primary/60" />
-              <div className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-red-600/60" />
-              <div className="absolute bottom-3 left-3 w-1.5 h-1.5 rounded-full bg-red-600/60" />
-              <div className="absolute bottom-3 right-3 w-1.5 h-1.5 rounded-full bg-primary/60" />
-            </div>
           </div>
         </div>
       </div>

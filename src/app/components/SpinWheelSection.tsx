@@ -182,7 +182,7 @@ export default function SpinWheelSection() {
 
         {/* T&C */}
         <p className="text-center text-muted-foreground text-xs mt-6 max-w-md mx-auto leading-relaxed">
-          * MEGA OFFER (Free Tattoo) is subject to availability and studio discretion. Valid on select designs only. One spin per customer. Offer valid during Durga Puja 2025 festival period only.
+          * MEGA OFFER (Free Tattoo) is subject to availability and studio discretion. Valid on select designs only. One spin per customer. Offer valid during Durga Puja 2026 festival period only.
         </p>
       </div>
 

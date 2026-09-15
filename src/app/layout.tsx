@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Fraunces, DM_Sans } from 'next/font/google';
 import '../styles/tailwind.css';
+import CursorGlow from '../components/CursorGlow';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className={dmSans.className}>
+        <CursorGlow />
         {children}
 
         <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fdurgapuja1727back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.20" />
